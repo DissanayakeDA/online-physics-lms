@@ -6,10 +6,16 @@ import Link from'next/link';
 import { useAuthStore } from'../../../store/authStore';
 import api from'../../../lib/api';
 import toast from'react-hot-toast';
-import { Mail, Lock, Eye, EyeOff, User, Phone, MapPin, ArrowRight, CheckCircle } from'lucide-react';
+import { Mail, Lock, Eye, EyeOff, User, Phone, MapPin, ArrowRight, ArrowLeft, CheckCircle, IdCard } from'lucide-react';
+
+function isValidLankaNic(raw: string): boolean {
+ const t = raw.trim().replace(/\s+/g, '');
+ if (/^\d{9}[vx]$/i.test(t)) return true;
+ return /^\d{12}$/.test(t);
+}
 
 export default function RegisterPage() {
- const [form, setForm] = useState({ fullName:'', email:'', password:'', confirmPassword:'', phone:'', address:'' });
+ const [form, setForm] = useState({ fullName:'', email:'', password:'', confirmPassword:'', phone:'', address:'', nic:'' });
  const [show, setShow] = useState(false);
  const [loading, setLoading] = useState(false);
  const { setAuth } = useAuthStore();
@@ -23,11 +29,16 @@ export default function RegisterPage() {
  if (!form.fullName || !form.email || !form.password) { toast.error('Fill required fields'); return; }
  if (form.password !== form.confirmPassword) { toast.error('Passwords do not match'); return; }
  if (form.password.length < 6) { toast.error('Password must be at least 6 characters'); return; }
+ if (!isValidLankaNic(form.nic)) {
+ toast.error('Enter a valid NIC (987654321V or 12-digit).');
+ return;
+ }
  setLoading(true);
  try {
  const { data } = await api.post('/auth/register', {
  fullName: form.fullName, email: form.email, password: form.password,
  phone: form.phone, address: form.address,
+ nic: form.nic.trim().replace(/\s+/g, ''),
  });
  setAuth(data.user, data.access_token);
  toast.success('Account created! Welcome!');
@@ -37,11 +48,15 @@ export default function RegisterPage() {
  } finally { setLoading(false); }
  };
 
- const fields = [
+ const fields: Array<{
+ name: keyof typeof form; label: string; type: string; icon: typeof User; placeholder: string; required: boolean; hint?: string;
+ }> = [
  { name:'fullName', label:'Full Name', type:'text', icon: User, placeholder:'Sadew Kodikara', required: true },
  { name:'email', label:'Email Address', type:'email', icon: Mail, placeholder:'you@example.com', required: true },
- { name:'phone', label:'Phone Number', type:'tel', icon: Phone, placeholder:'+94 77 123 4567', required: false },
+ { name:'phone', label:'Phone Number', type:'tel', icon: Phone, placeholder:'076 994 2470', required: false },
  { name:'address', label:'Address', type:'text', icon: MapPin, placeholder:'Your address', required: false },
+ { name:'nic', label:'NIC Number', type:'text', icon: IdCard, placeholder:'e.g. 123456789V or 12-digit NIC', required: true,
+ hint:'Sri Lanka NIC: old format 9 digits + V or X; new format 12 digits.' },
  ];
 
  return (
@@ -103,7 +118,7 @@ export default function RegisterPage() {
  </div>
 
  <form onSubmit={handleSubmit} className="space-y-3.5">
- {fields.map(({ name, label, type, icon: Icon, placeholder, required }) => (
+ {fields.map(({ name, label, type, icon: Icon, placeholder, required, hint }) => (
  <div key={name}>
  <label className="block text-sm font-semibold text-2 mb-1.5">
  {label} {required && <span style={{ color:'var(--danger)' }}>*</span>}
@@ -114,12 +129,14 @@ export default function RegisterPage() {
  </div>
  <input
  name={name} type={type}
- value={form[name as keyof typeof form]}
+ value={form[name] as string}
  onChange={set}
  className="input pl-14"
  placeholder={placeholder}
+ autoComplete={name === 'nic' ? 'off' : undefined}
  />
  </div>
+ {hint && <p className="text-xs text-3 mt-1.5 leading-snug">{hint}</p>}
  </div>
  ))}
 
@@ -173,6 +190,16 @@ export default function RegisterPage() {
  <span className="text-[#F57C20] cursor-pointer hover:underline">Terms</span> and{''}
  <span className="text-[#F57C20] cursor-pointer hover:underline">Privacy Policy</span>.
  </p>
+
+ <div className="mt-5 text-center">
+ <Link
+ href="/"
+ className="text-sm text-[#F57C20] font-semibold hover:underline inline-flex items-center justify-center gap-1"
+ >
+ <ArrowLeft className="w-3.5 h-3.5" />
+ Back to home
+ </Link>
+ </div>
  </div>
  </div>
  </div>

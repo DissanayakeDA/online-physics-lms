@@ -5,8 +5,9 @@ import Link from'next/link';
 import { useRouter } from'next/navigation';
 import { useAuthStore } from'../../../store/authStore';
 import api from'../../../lib/api';
+import { firstNameFromFullName } from'../../../lib/userDisplay';
 import toast from'react-hot-toast';
-import { Mail, Lock, Eye, EyeOff, ArrowRight, CheckCircle } from'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowRight, ArrowLeft, CheckCircle } from'lucide-react';
 
 export default function LoginPage() {
  const [email, setEmail] = useState('');
@@ -27,7 +28,7 @@ export default function LoginPage() {
  try {
  const { data } = await api.post('/auth/login', { email, password });
  setAuth(data.user, data.access_token);
- toast.success(`Welcome back, ${data.user.fullName.split('')[0]}!`);
+ toast.success(`Welcome back, ${firstNameFromFullName(data.user.fullName)}!`);
  router.push(data.user.role ==='admin' ?'/admin' :'/dashboard');
  } catch (err: any) {
  toast.error(err.response?.data?.message ||'Invalid credentials');
@@ -166,6 +167,16 @@ export default function LoginPage() {
  <p className="text-xs text-center text-2">
  <span className="font-bold text-[#F57C20]">Admin?</span> Use your admin credentials to access the admin panel.
  </p>
+ </div>
+
+ <div className="mt-6 text-center">
+ <Link
+ href="/"
+ className="text-sm text-[#F57C20] font-semibold hover:underline inline-flex items-center justify-center gap-1"
+ >
+ <ArrowLeft className="w-3.5 h-3.5" />
+ Back to home
+ </Link>
  </div>
  </div>
  </div>

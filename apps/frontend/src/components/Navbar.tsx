@@ -178,7 +178,7 @@ export default function Navbar() {
                   href="/auth/register"
                   className="px-5 py-2.5 text-sm font-semibold text-white bg-[#F57C20] hover:bg-[#E06C10] rounded-full transition-all shadow-md shadow-orange-500/25 active:scale-95"
                 >
-                  Sign Up
+                  Register
                 </Link>
               </>
             )}

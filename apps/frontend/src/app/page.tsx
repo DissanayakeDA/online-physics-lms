@@ -86,7 +86,7 @@ export default function HomePage() {
  <Navbar />
 
    {/* Hero */}
-   <section className="relative min-h-[92vh] flex items-center pt-16 overflow-hidden"
+   <section className="relative min-h-[92vh] flex flex-col pt-16 overflow-hidden"
    style={{ background: 'linear-gradient(135deg, #faf8f5 0%, #fff5eb 30%, #f0f4f8 60%, #faf8f5 100%)' }}>
 
    {/* ── Animated background layer ── */}
@@ -200,8 +200,9 @@ export default function HomePage() {
    ))}
    </div>
 
-   {/* ── Hero content ── */}
-   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10 w-full">
+   {/* ── Hero content (flex-1 keeps CTAs above the feature bar; no overlap with absolute bottom strip) ── */}
+   <div className="flex-1 flex items-center min-h-0 relative z-10 w-full">
+   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 w-full">
    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
    {/* Left column – text */}
    <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
@@ -218,14 +219,14 @@ export default function HomePage() {
 
    {/* Credentials */}
    <div className="mb-10">
-   <p className="text-[#2d3748] text-lg sm:text-xl font-bold mb-1">BSc. Physics (UG)</p>
+   <p className="text-[#2d3748] text-lg sm:text-xl font-bold mb-1">BSc. Physics</p>
    <p className="text-[#5a6a7e] text-base sm:text-lg italic">University of Kelaniya</p>
    </div>
 
    {/* CTA Buttons */}
    <div className="flex flex-wrap gap-4 justify-center lg:justify-start mb-12">
    <Link href="/classes" className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#F57C20] hover:bg-[#e06c10] text-white rounded-full font-semibold text-sm transition-all shadow-lg shadow-orange-400/30 active:scale-95">
-   Explore Classes <ArrowRight className="w-4 h-4" />
+   Ongoing classes <ArrowRight className="w-4 h-4" />
    </Link>
    <Link href="/auth/register" className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full font-semibold text-sm transition-all border-2 border-[#2d4a6f] text-[#2d4a6f] hover:bg-[#2d4a6f] hover:text-white">
    Register Now
@@ -247,9 +248,10 @@ export default function HomePage() {
    </div>
    </div>
    </div>
+   </div>
 
-   {/* Feature cards bar at bottom */}
-   <div className="absolute bottom-0 left-0 right-0 z-20">
+   {/* Feature cards bar — in flow below hero content so it never covers CTAs on small screens */}
+   <div className="relative z-20 shrink-0 w-full">
    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
    <div className="grid grid-cols-2 lg:grid-cols-4 gap-0 rounded-t-2xl overflow-hidden shadow-xl">
    {FEATURES.map(({ icon: Icon, title }, i) => {
@@ -348,39 +350,6 @@ export default function HomePage() {
  <Link href="/classes" className="btn-secondary inline-flex items-center gap-2">
  View All Classes <ChevronRight className="w-4 h-4" />
  </Link>
- </div>
- </div>
- </section>
-
- {/* CTA */}
- <section className="py-24 bg-white">
- <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
- <div className="rounded-3xl p-14 text-white text-center relative overflow-hidden"
- style={{ background:'linear-gradient(135deg, #1E3A5F 0%, #2d4a6f 50%, #F57C20 100%)' }}>
- <div className="absolute top-0 right-0 w-72 h-72 rounded-full" style={{ background:'rgba(255,255,255,0.08)', transform:'translate(40%,-40%)' }} />
- <div className="absolute bottom-0 left-0 w-56 h-56 rounded-full" style={{ background:'rgba(255,255,255,0.06)', transform:'translate(-30%,40%)' }} />
- <div className="relative z-10">
- <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-semibold mb-6"
- style={{ background:'rgba(255,255,255,0.15)', border:'1px solid rgba(255,255,255,0.25)' }}>
- Ready to Start?
- </span>
- <h2 className="text-4xl lg:text-5xl font-black mb-5" style={{ fontFamily:'Plus Jakarta Sans, sans-serif' }}>
- Begin Your Learning<br />
- <span className="text-orange-200">Journey Today</span>
- </h2>
- <p className="text-white/70 text-lg mb-10 max-w-lg mx-auto">
- Register now and access premium classes, live sessions and recorded lectures from expert instructors.
- </p>
- <div className="flex flex-wrap gap-4 justify-center">
- <Link href="/auth/register" className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full font-semibold text-base transition-all hover:opacity-90 active:scale-95 bg-white text-[#F57C20] shadow-lg">
- Create Free Account <ArrowRight className="w-5 h-5" />
- </Link>
- <Link href="/classes" className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full font-semibold text-base transition-all"
- style={{ background:'rgba(255,255,255,0.15)', border:'1px solid rgba(255,255,255,0.25)' }}>
- Browse Classes
- </Link>
- </div>
- </div>
  </div>
  </div>
  </section>

@@ -4,8 +4,11 @@ import { Toaster } from 'react-hot-toast';
 import { ThemeProvider } from '../components/ThemeProvider';
 
 export const metadata: Metadata = {
-  title: 'OnlinePHYSICS — Learn Without Limits',
+  title: 'Pasindu Serasinghe - OnlinePHYSICS',
   description: 'A modern learning management system with live classes, recordings, and expert instructors.',
+  icons: {
+    icon: [{ url: '/icon.svg', type: 'image/svg+xml' }],
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

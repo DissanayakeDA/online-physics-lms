@@ -5,6 +5,7 @@ import { useRouter } from'next/navigation';
 import Link from'next/link';
 import { useAuthStore } from'../../store/authStore';
 import api from'../../lib/api';
+import { firstNameFromFullName } from'../../lib/userDisplay';
 import {
  LayoutDashboard, BookOpen, Users, CreditCard, Bell, LogOut,
  Menu, TrendingUp, CheckCircle, Clock, AlertTriangle,
@@ -174,7 +175,7 @@ export default function AdminPage() {
  <div className="relative z-10">
  <p className="text-white/60 text-sm mb-1">Good day,</p>
  <h2 className="text-2xl font-black mb-2" style={{ fontFamily:'Plus Jakarta Sans, sans-serif' }}>
- {user.fullName.split('')[0]}!
+ {firstNameFromFullName(user.fullName)}!
  </h2>
  <p className="text-white/60 text-sm">
  You have <span className="text-white font-bold">{stats.pendingPayments}</span> pending payments to review.

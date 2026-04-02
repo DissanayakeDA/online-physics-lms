@@ -10,6 +10,26 @@ import * as bcrypt from 'bcryptjs';
 import { User, UserDocument, UserRole } from './schemas/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 
+function isMongoDuplicateKey(err: unknown): err is {
+  code: number;
+  keyPattern?: Record<string, number>;
+} {
+  return (
+    typeof err === 'object' &&
+    err !== null &&
+    'code' in err &&
+    (err as { code: unknown }).code === 11000
+  );
+}
+
+function normalizeNic(raw: string): string {
+  const t = raw.trim().replace(/\s+/g, '');
+  if (/^\d{9}[vx]$/i.test(t)) {
+    return t.slice(0, 9) + t[9].toUpperCase();
+  }
+  return t;
+}
+
 @Injectable()
 export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
@@ -22,9 +42,31 @@ export class UsersService {
       throw new ConflictException('Email already registered');
     }
 
+    const nic = normalizeNic(createUserDto.nic);
+    const existingNic = await this.userModel.findOne({ nic });
+    if (existingNic) {
+      throw new ConflictException('This NIC is already registered');
+    }
+
     const hashed = await bcrypt.hash(createUserDto.password, 12);
-    const user = new this.userModel({ ...createUserDto, password: hashed });
-    return user.save();
+    const user = new this.userModel({
+      ...createUserDto,
+      nic,
+      password: hashed,
+    });
+    try {
+      return await user.save();
+    } catch (err) {
+      if (isMongoDuplicateKey(err)) {
+        if (err.keyPattern?.nic) {
+          throw new ConflictException('This NIC is already registered');
+        }
+        if (err.keyPattern?.email) {
+          throw new ConflictException('Email already registered');
+        }
+      }
+      throw err;
+    }
   }
 
   async findByEmail(email: string): Promise<UserDocument | null> {
@@ -82,6 +124,13 @@ export class UsersService {
       { email: email.toLowerCase() },
       { resetOtp: otp, resetOtpExpiry: expiry },
       { new: true },
+    );
+  }
+
+  async clearResetOtp(email: string): Promise<void> {
+    await this.userModel.updateOne(
+      { email: email.toLowerCase() },
+      { $unset: { resetOtp: 1, resetOtpExpiry: 1 } },
     );
   }
 

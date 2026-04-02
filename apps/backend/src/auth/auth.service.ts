@@ -45,6 +45,7 @@ export class AuthService {
         fullName: user.fullName,
         email: user.email,
         role: user.role,
+        nic: user.nic,
       },
     };
   }
@@ -70,14 +71,28 @@ export class AuthService {
         fullName: user.fullName,
         email: user.email,
         role: user.role,
+        nic: user.nic,
       },
     };
   }
 
   async forgotPassword(email: string) {
+    /** Same message whether or not the account exists — avoids email enumeration. */
+    const message =
+      'If an account exists for this email, a 6-digit code was sent. It expires in 10 minutes.';
+
     const user = await this.usersService.findByEmail(email);
-    if (!user) throw new NotFoundException('No account found with this email');
-    if (!user.isActive) throw new ForbiddenException('Account is disabled');
+    if (!user || !user.isActive) {
+      return { message };
+    }
+
+    const smtpConfigured = Boolean(process.env.SMTP_USER && process.env.SMTP_PASS);
+    if (!smtpConfigured) {
+      console.warn(
+        '[forgot-password] SMTP_USER and SMTP_PASS are not both set; OTP email was not sent.',
+      );
+      return { message };
+    }
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
@@ -87,7 +102,7 @@ export class AuthService {
     try {
       await this.transporter.sendMail({
         from: process.env.SMTP_FROM || process.env.SMTP_USER || 'noreply@onlinephysics.com',
-        to: email,
+        to: user.email,
         subject: 'OnlinePHYSICS - Password Reset OTP',
         html: `
           <div style="font-family: 'Segoe UI', sans-serif; max-width: 480px; margin: 0 auto; padding: 32px; background: #fff; border-radius: 16px; border: 1px solid #e2e8f0;">
@@ -106,10 +121,10 @@ export class AuthService {
       });
     } catch (err) {
       console.error('Email send error:', err);
-      // Don't throw - still return success so attacker can't enumerate emails
+      await this.usersService.clearResetOtp(email);
     }
 
-    return { message: 'OTP sent to your email address' };
+    return { message };
   }
 
   async verifyOtp(email: string, otp: string) {

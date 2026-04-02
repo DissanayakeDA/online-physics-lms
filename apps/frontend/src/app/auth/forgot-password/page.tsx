@@ -24,8 +24,8 @@ export default function ForgotPasswordPage() {
     if (!email) { toast.error('Please enter your email'); return; }
     setLoading(true);
     try {
-      await api.post('/auth/forgot-password', { email });
-      toast.success('OTP sent to your email!');
+      const { data } = await api.post('/auth/forgot-password', { email });
+      toast.success(data?.message || 'Check your email for the code.');
       setStep('otp');
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to send OTP');
@@ -198,8 +198,29 @@ export default function ForgotPasswordPage() {
                       : <><span>Verify OTP</span><ArrowRight className="w-4 h-4" /></>
                     }
                   </button>
-                  <button type="button" onClick={() => { setOtp(''); handleSendOtp({ preventDefault: () => {} } as any); }}
-                    className="w-full text-sm text-[#F57C20] font-semibold hover:underline text-center py-2">
+                  <button
+                    type="button"
+                    disabled={loading}
+                    onClick={async () => {
+                      setOtp('');
+                      if (!email) return;
+                      setLoading(true);
+                      try {
+                        const { data } = await api.post('/auth/forgot-password', { email });
+                        toast.success(data?.message || 'Check your email for the code.');
+                      } catch (err: unknown) {
+                        const msg =
+                          err && typeof err === 'object' && 'response' in err
+                            ? (err as { response?: { data?: { message?: string } } }).response?.data
+                                ?.message
+                            : undefined;
+                        toast.error(msg || 'Failed to resend code');
+                      } finally {
+                        setLoading(false);
+                      }
+                    }}
+                    className="w-full text-sm text-[#F57C20] font-semibold hover:underline text-center py-2 disabled:opacity-50"
+                  >
                     Resend OTP
                   </button>
                 </form>

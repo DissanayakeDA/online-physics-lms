@@ -25,6 +25,13 @@ export class User {
   @Prop({ trim: true })
   address: string;
 
+  /**
+   * National Identity Card — at most one user account per NIC (DB unique index).
+   * Sparse so seeded admin and legacy users may omit NIC.
+   */
+  @Prop({ trim: true, unique: true, sparse: true })
+  nic?: string;
+
   @Prop({ enum: UserRole, default: UserRole.STUDENT })
   role: UserRole;
 

@@ -5,6 +5,30 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { Payment, PaymentDocument, PaymentStatus } from './schemas/payment.schema';
 import { ClassesService } from '../classes/classes.service';
 
+/** Sri Lanka NIC: legacy 9 digits + V/X, or 12-digit number */
+const LK_NIC_PATTERN = /^(\d{9}[VX]|\d{12})$/;
+
+function normalizeNic(raw: string): string {
+  const t = raw.trim().replace(/\s+/g, '');
+  if (/^\d{9}[vx]$/i.test(t)) {
+    return t.slice(0, 9) + t[9].toUpperCase();
+  }
+  return t;
+}
+
+function assertValidNic(raw: string): string {
+  if (!raw?.trim()) {
+    throw new BadRequestException('NIC number is required');
+  }
+  const nic = normalizeNic(raw);
+  if (!LK_NIC_PATTERN.test(nic)) {
+    throw new BadRequestException(
+      'Invalid NIC format. Use 9 digits followed by V or X (e.g. 123456789V), or a 12-digit NIC.',
+    );
+  }
+  return nic;
+}
+
 @Injectable()
 export class PaymentsService {
   constructor(
@@ -16,6 +40,7 @@ export class PaymentsService {
     studentId: string,
     classId: string,
     slipFilename: string,
+    nicRaw: string,
   ): Promise<PaymentDocument> {
     // Check if already paid/pending
     const existing = await this.paymentModel.findOne({
@@ -30,10 +55,13 @@ export class PaymentsService {
     // Verify class exists
     await this.classesService.findOne(classId);
 
+    const nic = assertValidNic(nicRaw);
+
     const payment = new this.paymentModel({
       studentId: new Types.ObjectId(studentId),
       classId: new Types.ObjectId(classId),
       slipImage: slipFilename,
+      nic,
       status: PaymentStatus.PENDING,
     });
 

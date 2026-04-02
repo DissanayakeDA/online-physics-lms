@@ -21,6 +21,10 @@ export class Payment {
   @Prop({ required: true })
   slipImage: string;
 
+  /** National Identity Card (enrollment) — old: 9 digits + V/X, new: 12 digits */
+  @Prop({ trim: true })
+  nic: string;
+
   @Prop({ enum: PaymentStatus, default: PaymentStatus.PENDING })
   status: PaymentStatus;
 

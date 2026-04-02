@@ -5,6 +5,7 @@ interface User {
   fullName: string;
   email: string;
   role: 'student' | 'admin';
+  nic?: string;
 }
 
 interface AuthState {

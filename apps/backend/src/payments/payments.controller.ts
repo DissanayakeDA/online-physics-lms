@@ -60,11 +60,12 @@ export class PaymentsController {
     @Param('classId') classId: string,
     @Request() req,
     @UploadedFile() file: Express.Multer.File,
+    @Body('nic') nic?: string,
   ) {
     if (!file) {
       throw new BadRequestException('Payment slip image is required');
     }
-    return this.paymentsService.submitPayment(req.user.id, classId, file.filename);
+    return this.paymentsService.submitPayment(req.user.id, classId, file.filename, nic ?? '');
   }
 
   @Get('my-payments')

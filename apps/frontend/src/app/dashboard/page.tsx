@@ -4,11 +4,12 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import api, { getUploadsUrl } from '../../lib/api';
+import { firstNameFromFullName } from '../../lib/userDisplay';
 import { useAuthStore } from '../../store/authStore';
 import toast from 'react-hot-toast';
 import {
   BookOpen, Clock, CheckCircle, XCircle, Play, Video, ChevronRight, Phone, MapPin, Mail,
-  LayoutDashboard, Bell, Settings, LogOut, Award, TrendingUp,
+  LayoutDashboard, Bell, Settings, LogOut, Award,
   Search, Menu, Star, Edit3, Lock, Save, User,
   AlertTriangle, Info,
 } from 'lucide-react';
@@ -16,6 +17,7 @@ import {
 
 interface Payment {
   _id: string; status: string; isEnrolled: boolean; isVerified: boolean;
+  nic?: string;
   createdAt: string; verificationExpiresAt?: string;
   classId: { _id: string; title: string; thumbnail: string; subject: string; instructor: string; price: number; recordings: any[]; liveClasses: any[]; };
 }
@@ -160,15 +162,7 @@ export default function DashboardPage() {
 
  const enrolled = payments.filter(p => p.isEnrolled && p.classId);
  const pending = payments.filter(p => p.status ==='pending');
- const rejected = payments.filter(p => p.status ==='rejected');
  const imgUrl = (t: string) => getUploadsUrl(t);
-
- const STAT_CARDS = [
- { label:'Enrolled', value: enrolled.length, color:'#F57C20', bg:'rgba(245,124,32,0.10)', icon: BookOpen },
- { label:'Pending', value: pending.length, color:'#F59E0B', bg:'rgba(245,158,11,0.10)', icon: Clock },
- { label:'Rejected', value: rejected.length, color:'#EF4444', bg:'rgba(239,68,68,0.10)', icon: XCircle },
- { label:'Total', value: payments.length, color:'#10B981', bg:'rgba(16,185,129,0.10)', icon: Award },
- ];
 
  const Sidebar = () => (
  <aside className="w-64 flex flex-col h-screen sticky top-0 shrink-0 bg-white border-r border-slate-200">
@@ -301,7 +295,7 @@ export default function DashboardPage() {
  <div className="relative z-10">
  <p className="text-white/70 text-sm font-medium mb-1">Welcome back</p>
  <h2 className="text-2xl font-black mb-2" style={{ fontFamily:'Plus Jakarta Sans, sans-serif' }}>
- {user.fullName.split('')[0]}!
+ {firstNameFromFullName(user.fullName)}!
  </h2>
  <p className="text-white/70 text-sm max-w-xs">
  You have <span className="text-white font-bold">{enrolled.length}</span> active courses.
@@ -312,22 +306,6 @@ export default function DashboardPage() {
  Continue Learning <ChevronRight className="w-4 h-4" />
  </button>
  </div>
- </div>
-
- {/* Stat Cards */}
- <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
- {STAT_CARDS.map(({ label, value, color, bg, icon: Icon }) => (
- <div key={label} className="card p-4 group hover:scale-[1.02] transition-transform">
- <div className="flex items-center justify-between mb-3">
- <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: bg }}>
- <Icon className="w-5 h-5" style={{ color }} />
- </div>
- <TrendingUp className="w-3.5 h-3.5 text-3" />
- </div>
- <p className="text-2xl font-black text-1">{loading ?'-' : value}</p>
- <p className="text-xs text-3 mt-0.5 font-medium">{label}</p>
- </div>
- ))}
  </div>
 
  {/* Enrolled Classes Cards */}
@@ -536,6 +514,7 @@ export default function DashboardPage() {
  <p className="font-semibold text-1 text-sm line-clamp-1">{p.classId?.title}</p>
  <p className="text-xs text-3 mt-0.5">
  Submitted {new Date(p.createdAt).toLocaleDateString()}
+ {p.nic && <> &middot; NIC {p.nic}</>}
  {p.verificationExpiresAt && p.isEnrolled && <> &middot; Expires {new Date(p.verificationExpiresAt).toLocaleDateString()}</>}
  </p>
  </div>
@@ -827,7 +806,6 @@ export default function DashboardPage() {
  { label:'Browse new classes', sub:'Explore available courses', icon: BookOpen, color:'#F57C20', href:'/classes' },
  { label:'Check payments', sub: `${pending.length} pending review`,icon: Clock, color:'#F59E0B', href:'#' },
  { label:'Enrolled classes', sub: `${enrolled.length} active`, icon: CheckCircle, color:'#10B981', href:'#' },
- { label:'My certificates', sub:'View achievements', icon: Award, color:'#0EA5E9', href:'#' },
  ].map(({ label, sub, icon: Icon, color, href }) => (
  <a key={label} href={href}
  onClick={href ==='#' ? (e) => { e.preventDefault(); if (label.includes('payment')) setActiveSection('payments'); else setActiveSection('classes'); } : undefined}

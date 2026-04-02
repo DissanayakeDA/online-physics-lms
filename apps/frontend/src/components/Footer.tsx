@@ -1,5 +1,26 @@
 import Link from'next/link';
-import { Mail, Phone, MapPin, Github, Twitter, Instagram } from'lucide-react';
+import { Mail, Phone, MapPin, Facebook, Youtube } from'lucide-react';
+
+const SOCIAL_LINKS = [
+  {
+    href: 'https://www.facebook.com/share/1CeNdWJCSn/?mibextid=wwXIfr',
+    label: 'Facebook',
+    Icon: Facebook,
+  },
+  {
+    href: 'https://youtube.com/@pasinduserasinghe-01?si=6JjKThY7TovFj_ht',
+    label: 'YouTube',
+    Icon: Youtube,
+  },
+] as const;
+
+function TikTokIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
+    </svg>
+  );
+}
 
 export default function Footer() {
  return (
@@ -13,14 +34,30 @@ export default function Footer() {
  </span>
  </Link>
  <p className="text-gray-500 text-sm leading-relaxed mb-5">
- A modern LMS empowering students to achieve their academic goals with live classes and expert instructors.
+ A modern LMS empowering students to achieve their academic goals with live classes and expert instructor.
  </p>
  <div className="flex gap-2">
- {[Github, Twitter, Instagram].map((Icon, i) => (
- <button key={i} className="w-9 h-9 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-400 hover:text-[#F57C20] hover:border-orange-300 transition-all">
- <Icon className="w-4 h-4" />
- </button>
+ {SOCIAL_LINKS.map(({ href, label, Icon: SIcon }) => (
+ <a
+ key={label}
+ href={href}
+ target="_blank"
+ rel="noopener noreferrer"
+ aria-label={label}
+ className="w-9 h-9 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-400 hover:text-[#F57C20] hover:border-orange-300 transition-all"
+ >
+ <SIcon className="w-4 h-4" />
+ </a>
  ))}
+ <a
+ href="https://www.tiktok.com/@pasindu.serasinghe?_r=1&_t=ZS-95AwUd4TqU6"
+ target="_blank"
+ rel="noopener noreferrer"
+ aria-label="TikTok"
+ className="w-9 h-9 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-400 hover:text-[#F57C20] hover:border-orange-300 transition-all"
+ >
+ <TikTokIcon className="w-4 h-4" />
+ </a>
  </div>
  </div>
 
@@ -45,22 +82,32 @@ export default function Footer() {
  <div>
  <h4 className="font-semibold text-gray-900 text-sm mb-4">Contact</h4>
  <ul className="space-y-3">
- {([
- [Mail,'support@onlinephysics.lms'],
- [Phone,'+94 77 123 4567'],
- [MapPin,'Colombo, Sri Lanka'],
- ] as const).map(([Icon, val], i) => (
- <li key={i} className="flex items-center gap-2.5 text-sm text-gray-500">
- <Icon className="w-4 h-4 text-[#F57C20] shrink-0" />
- {val}
+ <li className="flex items-center gap-2.5 text-sm text-gray-500">
+ <Mail className="w-4 h-4 text-[#F57C20] shrink-0" />
+ <a href="mailto:pasindu.ser@icloud.com" className="hover:text-[#F57C20] transition-colors">
+ pasindu.ser@icloud.com
+ </a>
  </li>
- ))}
+ <li className="flex items-center gap-2.5 text-sm text-gray-500">
+ <Phone className="w-4 h-4 text-[#F57C20] shrink-0" />
+ <a href="tel:+94769942470" className="hover:text-[#F57C20] transition-colors">
+ 076 994 2470
+ </a>
+ </li>
+ <li className="flex items-center gap-2.5 text-sm text-gray-500">
+ <MapPin className="w-4 h-4 text-[#F57C20] shrink-0" />
+ Colombo, Sri Lanka
+ </li>
  </ul>
  </div>
  </div>
 
  <div className="border-t border-gray-100 mt-12 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
- <p className="text-sm text-gray-500">&copy; {new Date().getFullYear()} OnlinePHYSICS LMS. All rights reserved.</p>
+ <div className="text-center sm:text-left">
+ <p className="text-sm text-gray-500">
+ &copy; {new Date().getFullYear()} KyndexLabs . All rights reserved.
+ </p>
+ </div>
  <div className="flex gap-6">
  <Link href="#" className="text-xs text-gray-500 hover:text-[#F57C20] transition-colors">Privacy Policy</Link>
  <Link href="#" className="text-xs text-gray-500 hover:text-[#F57C20] transition-colors">Terms of Service</Link>

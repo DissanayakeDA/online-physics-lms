@@ -8,7 +8,7 @@ import { useConfirmDialog } from '../ConfirmDialog';
 
 interface Payment {
   _id: string; status: string; isVerified: boolean; isEnrolled: boolean;
-  slipImage: string; createdAt: string; verifiedAt?: string;
+  slipImage: string; nic?: string; createdAt: string; verifiedAt?: string;
   verificationExpiresAt?: string; adminNote?: string;
   studentId: { _id: string; fullName: string; email: string; phone: string };
   classId: { _id: string; title: string; subject: string; price: number };
@@ -39,7 +39,7 @@ export default function AdminPayments() {
 
   const filtered = payments.filter(p => {
     const q = search.toLowerCase();
-    const matchQ = !search || p.studentId?.fullName?.toLowerCase().includes(q) || p.studentId?.email?.toLowerCase().includes(q) || p.classId?.title?.toLowerCase().includes(q);
+    const matchQ = !search || p.studentId?.fullName?.toLowerCase().includes(q) || p.studentId?.email?.toLowerCase().includes(q) || p.classId?.title?.toLowerCase().includes(q) || (p.nic && p.nic.toLowerCase().includes(q));
     return matchQ && (filter === 'all' || p.status === filter);
   });
 
@@ -87,7 +87,7 @@ export default function AdminPayments() {
         </div>
         <div className="relative">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-3" />
-          <input value={search} onChange={e => setSearch(e.target.value)} className="input pl-10 w-64" placeholder="Search student, class…" />
+          <input value={search} onChange={e => setSearch(e.target.value)} className="input pl-10 w-64" placeholder="Search student, class, NIC…" />
         </div>
       </div>
 
@@ -123,6 +123,7 @@ export default function AdminPayments() {
                     <div>
                       <p className="font-semibold text-1">{payment.studentId?.fullName || 'Unknown'}</p>
                       <p className="text-xs text-3">{payment.studentId?.email}</p>
+                      {payment.nic && <p className="text-xs text-2 font-mono mt-0.5">NIC: {payment.nic}</p>}
                     </div>
                   </div>
 

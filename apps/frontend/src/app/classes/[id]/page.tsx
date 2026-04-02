@@ -35,6 +35,12 @@ const NOTICE_CONFIG: Record<string, { icon: any; color: string; bg: string }> = 
   urgent:  { icon: XCircle,       color: '#EF4444', bg: 'rgba(239,68,68,0.10)' },
 };
 
+function isValidLankaNic(raw: string): boolean {
+  const t = raw.trim().replace(/\s+/g, '');
+  if (/^\d{9}[vx]$/i.test(t)) return true;
+  return /^\d{12}$/.test(t);
+}
+
 export default function ClassDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -44,6 +50,7 @@ export default function ClassDetailPage() {
   const [enrolled, setEnrolled] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [enrollmentNic, setEnrollmentNic] = useState('');
   const [activeTab, setActiveTab] = useState<'overview' | 'recordings' | 'live' | 'notices'>('overview');
   const [notices, setNotices] = useState<Notice[]>([]);
 
@@ -70,6 +77,7 @@ export default function ClassDetailPage() {
         if (payment) {
           setPaymentStatus(payment.status);
           setEnrolled(payment.isEnrolled);
+          if (payment.nic) setEnrollmentNic(payment.nic);
         }
       })
       .catch(() => {});
@@ -81,10 +89,16 @@ export default function ClassDetailPage() {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!user) { toast.error('Please login first'); router.push('/auth/login'); return; }
+    if (!isValidLankaNic(enrollmentNic)) {
+      toast.error('Enter a valid NIC (9 digits + V or X, or 12 digits).');
+      e.target.value = '';
+      return;
+    }
 
     setUploading(true);
     const fd = new FormData();
     fd.append('slip', file);
+    fd.append('nic', enrollmentNic.trim().replace(/\s+/g, ''));
     try {
       await api.post(`/payments/submit/${classId}`, fd);
       setPaymentStatus('pending');
@@ -136,6 +150,24 @@ export default function ClassDetailPage() {
   const url = imgUrl(cls.thumbnail);
   const colorIdx = cls.title.length % THUMB_COLORS.length;
   const thColor = THUMB_COLORS[colorIdx];
+
+  const enrollmentNicField = (
+    <div className="space-y-2">
+      <label htmlFor="enroll-nic" className="block text-xs font-semibold text-gray-700">NIC number</label>
+      <input
+        id="enroll-nic"
+        type="text"
+        autoComplete="off"
+        value={enrollmentNic}
+        onChange={(e) => setEnrollmentNic(e.target.value)}
+        placeholder="e.g. 123456789V or 12-digit NIC"
+        className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-[#F57C20] focus:ring-2 focus:ring-[#F57C20]/20 outline-none transition-all"
+      />
+      <p className="text-[11px] text-gray-500 leading-snug">
+        Required when you submit your payment slip. Old NIC: 9 digits + V or X. New NIC: 12 digits.
+      </p>
+    </div>
+  );
 
   const TABS = [
     { id: 'overview', label: 'Overview', icon: BookOpen },
@@ -431,6 +463,7 @@ export default function ClassDetailPage() {
                       <p className="text-xs text-red-600">Please re-submit a valid payment slip.</p>
                     </div>
                   </div>
+                  {enrollmentNicField}
                   <label className="btn-primary w-full justify-center py-3 gap-2 cursor-pointer">
                     <Upload className="w-4 h-4" /> Re-upload Slip
                     <input type="file" accept="image/*,.pdf" className="hidden" onChange={handleSlipUpload} />
@@ -438,6 +471,7 @@ export default function ClassDetailPage() {
                 </div>
               ) : (
                 <div className="space-y-3">
+                  {enrollmentNicField}
                   <label className={`btn-primary w-full justify-center py-3 gap-2 cursor-pointer ${uploading ? 'opacity-60 pointer-events-none' : ''}`}>
                     {uploading ? (
                       <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
