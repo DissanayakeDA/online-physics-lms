@@ -5,7 +5,7 @@ import Link from'next/link';
 import Navbar from'../../components/Navbar';
 import Footer from'../../components/Footer';
 import api, { getUploadsUrl } from'../../lib/api';
-import { BookOpen, Search, Users, Clock, SlidersHorizontal, X, Star, ChevronRight } from'lucide-react';
+import { BookOpen, Search, Clock, SlidersHorizontal, X, Star, ChevronRight } from'lucide-react';
 
 interface Class {
  _id: string; title: string; subject: string; instructor: string; price: number;
@@ -232,8 +232,7 @@ export default function ClassesPage() {
  <span className="text-xs font-semibold text-2 truncate max-w-[100px]">{cls.instructor}</span>
  </div>
  <div className="flex items-center gap-2 text-xs text-3">
- <Users className="w-3 h-3" /> {cls.enrolledCount}
- {cls.duration && <><Clock className="w-3 h-3 ml-1" /> {cls.duration}</>}
+ {cls.duration && <><Clock className="w-3 h-3" /> {cls.duration}</>}
  </div>
  </div>
 
