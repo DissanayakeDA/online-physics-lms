@@ -9,7 +9,7 @@ import api, { getUploadsUrl } from '../../../lib/api';
 import { useAuthStore } from '../../../store/authStore';
 import toast from 'react-hot-toast';
 import {
-  BookOpen, Video, Play, Clock, Users, ArrowLeft, Upload, CheckCircle,
+  BookOpen, Video, Play, Clock, ArrowLeft, Upload, CheckCircle,
   AlertCircle, Calendar, Award, ExternalLink, Bell,
   AlertTriangle, XCircle, Info,
 } from 'lucide-react';
@@ -213,8 +213,7 @@ export default function ClassDetailPage() {
                   </div>
                   {cls.instructor}
                 </span>
-                <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" /> {cls.enrolledCount} students</span>
-                {cls.duration && <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {cls.duration}</span>}
+{cls.duration && <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {cls.duration}</span>}
                 <span className="flex items-center gap-1"><Video className="w-3.5 h-3.5" /> {cls.recordings.length} recordings</span>
               </div>
             </div>
@@ -496,7 +495,6 @@ export default function ClassDetailPage() {
                   { label: 'Subject', value: cls.subject },
                   { label: 'Level', value: cls.level || 'All Levels' },
                   { label: 'Duration', value: cls.duration || 'Self-paced' },
-                  { label: 'Students', value: `${cls.enrolledCount} enrolled` },
                   { label: 'Recordings', value: `${cls.recordings.length} videos` },
                   { label: 'Live Classes', value: `${cls.liveClasses.length} sessions` },
                 ].map(({ label, value }) => (
