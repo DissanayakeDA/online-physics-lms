@@ -7,7 +7,7 @@ import Footer from'../components/Footer';
 import AboutTeacher from'../components/AboutTeacher';
 import api, { getUploadsUrl } from'../lib/api';
 import {
- ArrowRight, Users, BookOpen, ChevronRight,
+ ArrowRight, BookOpen, ChevronRight,
  Headphones, MonitorPlay, FolderOpen, MessageCircle,
 } from'lucide-react';
 
